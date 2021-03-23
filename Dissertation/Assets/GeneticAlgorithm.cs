@@ -82,6 +82,7 @@ public class GeneticAlgorithm : MonoBehaviour
             GenerateNewLayout(Layouts, individual);
             ConvertToFlatArray(Layouts, OneDLayouts, individual);
             DisplayLayout(OneDLayouts, Layouts, individual);
+            
         }
     }
 
@@ -115,6 +116,11 @@ public class GeneticAlgorithm : MonoBehaviour
         }
     }
 
+    void ShowFitness(int individual)
+    {
+        Debug.Log(FitnessScores[individual]);
+    }
+
     void Update()
     {
         if (Time.frameCount == 1)
@@ -124,6 +130,7 @@ public class GeneticAlgorithm : MonoBehaviour
             FitnessScores = new int[PopulationSize];
             FindBestLayout(Layouts, OneDLayouts);
         }
+
 
     }
 }

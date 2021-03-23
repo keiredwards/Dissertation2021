@@ -13,21 +13,17 @@ public class FitnessOneLongShelf : MonoBehaviour
         LayoutNum = int.Parse(transform.parent.name);
         ScriptHolder = GameObject.Find("ScriptHolder");
 
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Checked < 2)
+        if (transform.parent.position.x == 0)
         {
 
-            if (transform.parent.position.x == 0)
-            {
+            //Debug.Log("we at 0 baws");
+            transform.parent.position = new Vector3(0, 0, LayoutNum * 10);
 
-                //Debug.Log("we at 0 baws");
-                transform.parent.position = new Vector3(0, 0, LayoutNum * 10);
+        }
 
-            }
+        if (Checked < 1)
+        {
+
             RaycastHit hit;
             if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, 2f))
             {
@@ -36,13 +32,19 @@ public class FitnessOneLongShelf : MonoBehaviour
                 //Debug.Log("WE gotta hit capn");
             }
             Checked++;
-            
+
         }
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+       
     }
 
     void AddtoFitness()
     {
-        Debug.Log(LayoutNum);
+        //Debug.Log(LayoutNum);
         ScriptHolder.GetComponent<GeneticAlgorithm>().FitnessScores[LayoutNum] += 1;
 
     }
