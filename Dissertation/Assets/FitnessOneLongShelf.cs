@@ -1,61 +1,64 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
-using System;
+using UnityEngine.Serialization;
 
 public class FitnessOneLongShelf : MonoBehaviour
 {
-    private int LayoutNum;
-    public GameObject ScriptHolder;
-    private int Checked = 0;
+    [FormerlySerializedAs("ScriptHolder")] public GameObject scriptHolder;
+    private int _generation;
+
+    private int _layoutNum;
+
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        LayoutNum = int.Parse(transform.parent.name);
-        Debug.Log(LayoutNum);
-        ScriptHolder = GameObject.Find("ScriptHolder");
+        _generation = (int) Math.Floor(transform.position.x / 10);
+        _layoutNum = int.Parse(transform.parent.name);
+        //Debug.Log(LayoutNum);
+        scriptHolder = GameObject.Find("ScriptHolder");
+        //Debug.Log("gen:" + generation + "layout" + LayoutNum);
 
-        if (transform.parent.position.x == 0)
+
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, 2f))
         {
-
-            //Debug.Log("we at 0 baws");
-            transform.parent.position = new Vector3(0, 0, LayoutNum * 10);
-
+            //Debug.Log("AddtoFitness Called" + "Gen:" + generation + "Layout:" + LayoutNum);
+            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.red);
+            //Debug.Log("WE gotta hit capn" + "," + LayoutNum);
+            AddtoFitness();
         }
 
         
+        GeneticAlgorithm.shelvesChecked[_generation] += 1;
+        //Debug.Log(GeneticAlgorithm.shelvesChecked[_generation]);
+        
+        if (GeneticAlgorithm.shelvesChecked[_generation] == scriptHolder.GetComponent<GeneticAlgorithm>().totalShelves &&
+            _generation < scriptHolder.GetComponent<GeneticAlgorithm>().maxGenerations - 1)
+            
+            //Debug.Log(generation);
+            scriptHolder.GetComponent<GeneticAlgorithm>().Run(_generation);
+        //Debug.Log(ScriptHolder.GetComponent<GeneticAlgorithm>().FitnessScores[generation, 0]);
+        //Debug.Log(ScriptHolder.GetComponent<GeneticAlgorithm>().FitnessScores[generation, 1]);
+        //Debug.Log(ScriptHolder.GetComponent<GeneticAlgorithm>().FitnessScores[generation, 2]);
+        //Debug.Log(ScriptHolder.GetComponent<GeneticAlgorithm>().FitnessScores[generation, 3]);
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        if (Time.frameCount==1)
+        if (Time.frameCount == 1)
         {
             //Debug.Log(LayoutNum);
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, 2f))
-            {
-
-                Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.red);
-                //Debug.Log("WE gotta hit capn" + "," + LayoutNum);
-                AddtoFitness();
-                
-            }
-            Checked++;
-
         }
 
         //Debug.Log(ScriptHolder.GetComponent<GeneticAlgorithm>().FitnessScores[0, 0]);
     }
 
-    void AddtoFitness()
+    private void AddtoFitness()
     {
-
-        int generation = (int) Math.Floor(transform.position.x/10);
         //Debug.Log(generation + "gen");
 
-        ScriptHolder.GetComponent<GeneticAlgorithm>().FitnessScores[generation,LayoutNum] += 1;
-        //Debug.Log(ScriptHolder.GetComponent<GeneticAlgorithm>().FitnessScores[generation, LayoutNumber] + "<< Fitness" + LayoutNum + generation);
-
+        scriptHolder.GetComponent<GeneticAlgorithm>().FitnessScores[_generation, _layoutNum] += 1;
+        //Debug.Log(ScriptHolder.GetComponent<GeneticAlgorithm>().FitnessScores[generation, LayoutNum] + "<< Fitness" + LayoutNum + generation);
     }
 }
