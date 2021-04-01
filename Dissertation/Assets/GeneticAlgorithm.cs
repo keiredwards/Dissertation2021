@@ -23,10 +23,9 @@ public class GeneticAlgorithm : MonoBehaviour
     [FormerlySerializedAs("OneShelf")] public GameObject oneShelf;
     [FormerlySerializedAs("Path")] public GameObject path;
     public int generation;
-
-    private int[,,,] _layouts;
-    private int[,,] _oneDLayouts;
-
+    
+    private static int[,,,] _layouts;
+    private static int[,,] _oneDLayouts;
     public int[,] FitnessScores = new int[10, 10];
 
     private void Start()
@@ -34,16 +33,14 @@ public class GeneticAlgorithm : MonoBehaviour
         //Debug.Log(shelvesChecked[0]);
         totalShelves = populationSize * oneLengthShelvesCount;
 
-        var layouts = new int[maxGenerations, populationSize, width, height];
-        var oneDLayouts = new int[maxGenerations, populationSize, width * height];
-
-        //Debug.Log(shelvesChecked[0]);
+        _layouts = new int[maxGenerations, populationSize, width, height];
+        _oneDLayouts = new int[maxGenerations, populationSize, width * height];
 
 
         CreateFitnessScores(FitnessScores);
 
-        GenerateNewLayout(layouts);
-        FindBestLayout(layouts, oneDLayouts, 0, FitnessScores);
+        GenerateNewLayout(FitnessScores);
+        FindBestLayout(_layouts, _oneDLayouts, 0, FitnessScores);
     }
 
     private void Update()
@@ -71,15 +68,19 @@ public class GeneticAlgorithm : MonoBehaviour
     }
 
 
-    private int[,,,] GenerateNewLayout(int[,,,] layouts)
+    private void GenerateNewLayout(int [,] FitnessScores)
     {
         for (var generation = 0; generation < maxGenerations; generation++)
         for (var individual = 0; individual < populationSize; individual++)
         for (var x = 0; x < width; x++) //Create Empty 2d Array Representing Shop Floor of only Paths where 0 is a path.
         for (var y = 0; y < height; y++)
-            layouts[generation, individual, x, y] = 0;
+        {
+            _layouts[generation, individual, x, y] = 100000 + x + y * width;
+            _oneDLayouts[generation, individual, y + x * width] = 0;
+        }
 
-        //Debug.Log(Layouts[1, 1, 1, 1]);
+        
+        //Debug.Log(_oneDLayouts[1, 1, 1]);
         //Debug.Log(Layouts[2, 2, 0, 0]);
 
 
@@ -89,17 +90,15 @@ public class GeneticAlgorithm : MonoBehaviour
             var posx = Random.Range(0, width);
             var posy = Random.Range(0, height);
 
-            while (layouts[0, individual, posx, posy] != 0) //find a new position for shelf if not on pathv 
+            while (_layouts[0, individual, posx, posy] < 100000) //find a new position for shelf if not on pathv 
             {
                 posx = Random.Range(0, width);
                 posy = Random.Range(0, height);
             }
 
-            layouts[0, individual, posx, posy] = 1;
+            _layouts[0, individual, posx, posy] = 10000+x;
         }
-
-
-        return layouts;
+        
     }
 
     private int[,,] ConvertToFlatArray(int[,,,] layouts, int[,,] oneDLayouts, int individual, int generation)
@@ -109,7 +108,7 @@ public class GeneticAlgorithm : MonoBehaviour
             //ebug.Log(x + "," + y);
             //Debug.Log(x + "," + y + "=" + Layouts[individual, x, y]);
             //OneDLayouts[generation, individual,(x+(y*Width))] = 0;
-            oneDLayouts[generation, individual, x + y * width] = layouts[generation, individual, x, y];
+            oneDLayouts[generation, individual, x + y * width] = _layouts[generation, individual, x, y];
 
         return oneDLayouts;
     }
@@ -128,7 +127,7 @@ public class GeneticAlgorithm : MonoBehaviour
 
 
             ConvertToFlatArray(layouts, oneDLayouts, individual, generation);
-            DisplayLayout(oneDLayouts, layouts, individual, generation);
+            DisplayLayout(oneDLayouts, _layouts, individual, generation);
         }
     }
 
@@ -138,17 +137,20 @@ public class GeneticAlgorithm : MonoBehaviour
 
         for (var x = 0; x < width; x++) //Place Paths and Shelves Appropriately
         for (var z = 0; z < height; z++)
-            if (layouts[generation, individual, x, z] == 0)
+            if (layouts[generation, individual, x, z] >= 100000)    //paths are denoted by 100,000+ values
             {
                 var path = Instantiate(this.path, new Vector3(x + generation * 10, 0, z + individual * 10),
                     Quaternion.identity);
+                path.name = _layouts[generation, individual, x, z].ToString();
                 path.transform.parent = GameObject.Find(individual.ToString()).transform;
             }
-            else if (layouts[generation, individual, x, z] == 1)
+            else if (layouts[generation, individual, x, z] < 100000) //shelves are denoted by <100,000 values
             {
                 var shelf = Instantiate(oneShelf, new Vector3(generation * 10 + x, 0.5f, z + individual * 10),
                     Quaternion.identity);
+                shelf.name = _layouts[generation, individual, x, z].ToString();
                 shelf.transform.parent = GameObject.Find(individual.ToString()).transform;
+                
                 //Shelf.transform.parent.transform.position = new Vector3(individual * 20, 0, 0);
             }
 
@@ -156,11 +158,6 @@ public class GeneticAlgorithm : MonoBehaviour
         {
             //Debug.Log(OneDLayouts[generation, individual,x]);
         }
-    }
-
-    private void ShowFitness(int individual, int generation)
-    {
-        //Debug.Log(FitnessScores[generation, individual]);
     }
 
     private void ChooseParents(int[,] fitnessScores, int generation)
@@ -204,17 +201,32 @@ public class GeneticAlgorithm : MonoBehaviour
     {
         var parent1 = new int[width * height];
         var parent2 = new int[width * height];
+        
+        int[] child1 = new int[width * height];
+        int[] child2 = new int[width * height];
 
-        for (var x = 0; x < width; x++)
+        Dictionary<int, int> RelationshipsOneAsKey = new Dictionary<int, int>();
+        Dictionary<int, int> RelationshipsTwoAsKey = new Dictionary<int, int>();
+        
+
+        for (var x = 0; x < width*height; x++)
         {
             parent1[x] = oneDLayouts[generation, parent1Num, x];
             parent2[x] = oneDLayouts[generation, parent2Num, x];
+
+            child1[x] = 0;
+            child2[x] = 0;
         }
 
+        int crossOverPoint1 = 0;
+        int crossOverPoint2 = 0;
 
-        var crossOverPoint1 = Random.Range(0, parent1.Length);
-        var crossOverPoint2 = Random.Range(0, parent2.Length); //choose a point to cut the gene
-        //Debug.Log(CrossOverPoint);
+        while (crossOverPoint1 == crossOverPoint2)  //generate two points to cut gene that arent the same point
+        {
+            crossOverPoint1 = Random.Range(0, parent1.Length+1);    //cut points are before selected index. i.e index 3:
+            crossOverPoint2 = Random.Range(0, parent2.Length+1);    // 012|345
+        }
+         
 
         if (crossOverPoint1 > crossOverPoint2) //Swaps over so 1 is always smaller
         {
@@ -222,12 +234,49 @@ public class GeneticAlgorithm : MonoBehaviour
             crossOverPoint1 = crossOverPoint2;
             crossOverPoint2 = temp;
         }
+
+
+        for (int x = crossOverPoint1; x < crossOverPoint2; ++x)
+        {
+            child1[x] = parent2[x];
+            child2[x] = parent1[x];
+
+            RelationshipsOneAsKey.Add(parent1[x], parent2[x]);
+            RelationshipsTwoAsKey.Add(parent2[x], parent1[x]);
+        }
+
+        for (int x = 0; x < crossOverPoint1; ++x)
+        {
+            if (child1.Contains(parent1[x]))
+            {
+                child1[x] = RelationshipsOneAsKey[
+                    parent1[x]];     //this might need to get value from relationshipstwoaskey instead
+
+            }
+            else
+            {
+                child1[x] = parent1[x];
+            }
+            
+            if (child2.Contains(parent2[x]))
+            {
+                child2[x] = RelationshipsTwoAsKey[
+                    parent2[x]];    //this might need to get value from relationshipstwoaskey instead
+            }
+            else
+            {
+                child1[x] = parent1[x];
+            }
+            
+        }
+
+
     }
 
     public void Run(int generation)
     {
         ChooseParents(FitnessScores, generation);
-        GenerateChildren(generation); //generate children from previous generation
+        //GenerateChildren(generation); //generate children from previous generation
 
 
         FindBestLayout(_layouts, _oneDLayouts, generation + 1, FitnessScores); //then build these children
