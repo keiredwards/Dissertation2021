@@ -12,7 +12,8 @@ public class FitnessOneLongShelf : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        _generation = (int) Math.Floor(transform.position.x / 10);
+        _generation = (int) Math.Floor(transform.position.x / (2*(scriptHolder.GetComponent<GeneticAlgorithm>().width) + 2));
+        Debug.Log(_generation + "," + transform.position.x);
         _layoutNum = int.Parse(transform.parent.name);
         //Debug.Log(LayoutNum);
         scriptHolder = GameObject.Find("ScriptHolder");
@@ -28,14 +29,14 @@ public class FitnessOneLongShelf : MonoBehaviour
             AddtoFitness();
         }
 
-        
+        //Debug.Log(_generation);
         GeneticAlgorithm.shelvesChecked[_generation] += 1;
         //Debug.Log(GeneticAlgorithm.shelvesChecked[_generation]);
         
         if (GeneticAlgorithm.shelvesChecked[_generation] == scriptHolder.GetComponent<GeneticAlgorithm>().totalShelves &&
             _generation < scriptHolder.GetComponent<GeneticAlgorithm>().maxGenerations - 1)
             
-            //Debug.Log(generation);
+            Debug.Log("run");
             scriptHolder.GetComponent<GeneticAlgorithm>().Run(_generation);
         //Debug.Log(ScriptHolder.GetComponent<GeneticAlgorithm>().FitnessScores[generation, 0]);
         //Debug.Log(ScriptHolder.GetComponent<GeneticAlgorithm>().FitnessScores[generation, 1]);
@@ -58,7 +59,7 @@ public class FitnessOneLongShelf : MonoBehaviour
     {
         //Debug.Log(generation + "gen");
 
-        scriptHolder.GetComponent<GeneticAlgorithm>().FitnessScores[_generation, _layoutNum] += 1;
+        GeneticAlgorithm.FitnessScores[_generation, _layoutNum] += 1;
         //Debug.Log(ScriptHolder.GetComponent<GeneticAlgorithm>().FitnessScores[generation, LayoutNum] + "<< Fitness" + LayoutNum + generation);
     }
 }

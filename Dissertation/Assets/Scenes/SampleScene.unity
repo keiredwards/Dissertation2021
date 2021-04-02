@@ -277,13 +277,33 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
+      propertyPath: width
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
+      propertyPath: height
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
       propertyPath: MaxGenerations
       value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
       propertyPath: maxGenerations
-      value: 6
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
+      propertyPath: populationSize
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
+      propertyPath: oneLengthShelvesCount
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207441, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
