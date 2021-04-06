@@ -43,14 +43,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a3a5bad9f8b01241a287346826c2a15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Width: 4
-  Height: 4
-  OneLengthShelvesCount: 6
-  TotalShelves: 0
-  PopulationSize: 4
-  MaxGenerations: 3
-  OneShelf: {fileID: 2877290566372902708, guid: 7eb6180b79b189c4e85075f510741ea8,
+  width: 0
+  height: 0
+  oneLengthShelvesCount: 0
+  totalShelves: 0
+  populationSize: 0
+  maxGenerations: 0
+  oneShelf: {fileID: 2877290566372902708, guid: 7eb6180b79b189c4e85075f510741ea8,
     type: 3}
-  Path: {fileID: 1736745141943396166, guid: 39eb1cd4f1ea9f24c8e006c5b959e590, type: 3}
+  path: {fileID: 1736745141943396166, guid: 39eb1cd4f1ea9f24c8e006c5b959e590, type: 3}
   generation: 0
-  ShelvesChecked: 
