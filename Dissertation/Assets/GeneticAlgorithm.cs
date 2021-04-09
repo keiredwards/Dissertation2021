@@ -39,6 +39,8 @@ public class GeneticAlgorithm : MonoBehaviour
     private static int[,,] _oneDLayouts;
     private static int[,,] _parentIndexes;
     public static int[,] FitnessScores;
+
+    public int checkPosition = 0;
     System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
 
     private void Start()
@@ -696,4 +698,108 @@ public class GeneticAlgorithm : MonoBehaviour
                 _layouts[generation + 1, individual, x, z] = _layouts[generation, bestLayout, x, z];
         return _layouts;
     }
+
+    void CheckValidity(int generation, int individual)
+    {
+
+
+        List<int> visited = new List<int>();
+
+        bool pathfound = false;
+        int starterpathpos;
+        while (pathfound == false)
+        {
+            for (int x = 0; x < width * height; x++)
+            {
+                if (_oneDLayouts[generation, individual, x] >= 200000)
+                {
+                    pathfound = true;
+                    checkPosition = x;
+                }
+            }
+        }
+
+        bool searchedall = false;
+
+        while (searchedall == false)
+        {
+            if (Right(individual,visited))
+            {
+                 
+            }
+            else if(Left(individual,visited))
+            {
+                
+            }
+            else if(Up(individual,visited))
+            {
+                
+            }
+            else if(Down(individual,visited))
+            {
+                
+            }
+            else
+            {
+                int index = visited.IndexOf(checkPosition);
+                checkPosition = [index - 1];
+
+            }
+        }
+    }
+    
+    bool Right( int individual, List<int> visited)
+    {
+
+        if (_oneDLayouts[generation, individual, checkPosition + 1] >= 200000)
+        {
+            if (!visited.Contains(_oneDLayouts[generation, individual, checkPosition + 1]))
+            {
+                checkPosition += 1;
+                return true;
+            }
+        }
+
+        return false;
+    }
+        
+    bool Left(int individual, List<int> visited)
+    {
+        if (_oneDLayouts[generation, individual, checkPosition - 1] >= 200000)
+        {
+            if (!visited.Contains(_oneDLayouts[generation, individual, checkPosition - 1]))
+            {
+                checkPosition -= 1;
+                return true;
+            }
+        }
+        return false;
+    }
+        
+    bool Up(int individual, List<int> visited)
+    {
+        if (_oneDLayouts[generation, individual, checkPosition + height] >= 200000)
+        {
+            if (!visited.Contains(_oneDLayouts[generation, individual, checkPosition + height]))
+            {
+                checkPosition += height;
+                return true;
+            }
+        }
+        return false;
+    }
+        
+    bool Down( int individual, List<int> visited)
+    {
+        if (_oneDLayouts[generation, individual, checkPosition - height] >= 200000)
+        {
+            if (!visited.Contains(_oneDLayouts[generation, individual, checkPosition - height]))
+            {
+                checkPosition -= height;
+                return true;
+            }
+        }
+        return false;
+    }
 }
+
