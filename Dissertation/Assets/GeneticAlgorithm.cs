@@ -15,6 +15,8 @@ public class GeneticAlgorithm : MonoBehaviour
     public int framerate;
     public bool SinglePointCrossOver;
     public bool PartiallyMappedCrossover;
+    private int bestLayoutIndividual;
+    private int bestLayoutGeneration;
     
     [FormerlySerializedAs("Height")] public int height;
 
@@ -50,7 +52,6 @@ public class GeneticAlgorithm : MonoBehaviour
         //Debug.Log(width + "WIDTHHHHHHHHHHHHHHHHHH");
         //Debug.Log(shelvesChecked[0]);
         totalShelves = populationSize * oneLengthShelvesCount;
-
         _layouts = new int[maxGenerations, populationSize, width, height];
         _oneDLayouts = new int[maxGenerations, populationSize, width * height];
         _parentIndexes = new int[maxGenerations, populationSize,2];
@@ -67,6 +68,7 @@ public class GeneticAlgorithm : MonoBehaviour
         GenerateNewLayout();
         FindBestLayout(_layouts, _oneDLayouts, 0);
         
+        
     }
 
 
@@ -77,7 +79,7 @@ public class GeneticAlgorithm : MonoBehaviour
         
          //Debug.Log("shelves checked :  " + shelvesChecked[generation]);
 
-         if (shelvesChecked[generation] == totalShelves && generation < maxGenerations-1 && bestLayout>0)
+         if ( generation < maxGenerations-1 && bestLayout>0)
             {
                 //Debug.Log("run");
                 generation++;
@@ -94,7 +96,7 @@ public class GeneticAlgorithm : MonoBehaviour
             {
                 Debug.Log("VICTORY");
             }
-
+         GenerateBest(bestLayoutGeneration, bestLayoutIndividual);
     }
 
 
@@ -209,12 +211,15 @@ public class GeneticAlgorithm : MonoBehaviour
     {
         for (var individual = 0; individual < populationSize; individual++)
         {
+            
             //Debug.Log("gen" + generation);
             FitnessScores[generation, individual] = 0;
 
 
             ConvertToFlatArray(layouts, oneDLayouts, individual, generation);
-            DisplayLayout(individual, generation);
+            //DisplayLayout(individual, generation);
+            ShelfFitness(generation,individual);
+            CheckValidity(0,individual);
         }
     }
 
@@ -591,7 +596,7 @@ public class GeneticAlgorithm : MonoBehaviour
     {
         //Debug.Log("A NEW GENERATION");
         
-        ClearLayouts();
+        //ClearLayouts();
           
         
         int averageFitness = 0;
@@ -606,8 +611,10 @@ public class GeneticAlgorithm : MonoBehaviour
                 {
                     //MoveCamera(generation, individual);
                     bestLayout = FitnessScores[generation - 1, individual];
+                    bestLayoutGeneration = generation - 1;
+                    bestLayoutIndividual = individual;
                    Debug.Log(bestLayout + "gen:" + generation + "  indv:" + individual);
-                    GenerateBest(generation-1, individual);
+                    
                 }
             }
         }
@@ -663,8 +670,9 @@ public class GeneticAlgorithm : MonoBehaviour
                 }
                 
                 
-                
-                DisplayLayout(individual, generation);
+                CheckValidity(generation,individual);
+                ShelfFitness(generation, individual);
+                //DisplayLayout(individual, generation);
                 
                 
             }
@@ -702,61 +710,127 @@ public class GeneticAlgorithm : MonoBehaviour
     void CheckValidity(int generation, int individual)
     {
 
+        //Debug.Log("validy checked of gen, individual" + generation + ", " + individual);
+        List<int> allvisited = new List<int>();
 
-        List<int> visited = new List<int>();
 
-        bool pathfound = false;
-        int starterpathpos;
+        int pathssearched = 0;
+        int pathsections = 0;
+        //Debug.Log(pathssearched<width*height-totalShelves);
+        while(pathssearched<width*height-oneLengthShelvesCount){
+            //Debug.Log("here");
+            List<int> visited = new List<int>();
+            bool pathfound = false;
+            int x = 0;
+            int pathsconnected = 0;
+            
+            bool searchedall = false;
+            
         while (pathfound == false)
         {
-            for (int x = 0; x < width * height; x++)
+            
+            if (_oneDLayouts[generation, individual, x] >= 200000 && !(allvisited.Contains(x)))
             {
-                if (_oneDLayouts[generation, individual, x] >= 200000)
-                {
-                    pathfound = true;
-                    checkPosition = x;
-                }
+                pathfound = true;
+                checkPosition = x;
+                visited.Add(checkPosition);
+                //Debug.Log(checkPosition);
+                pathsconnected += 1;
+                
             }
+
+            x++;
         }
 
-        bool searchedall = false;
-
+        int starterposition = checkPosition;
+        
         while (searchedall == false)
         {
-            if (Right(individual,visited))
-            {
-                 
+            //Debug.Log(checkPosition);
+            if (Right(individual, visited))
+            { //Debug.Log("right     " );
+                pathsconnected += 1;
             }
-            else if(Left(individual,visited))
+            else if (Left(individual, visited))
             {
-                
+                //Debug.Log("left    " );
+                pathsconnected += 1;
             }
-            else if(Up(individual,visited))
+            else if (Up(individual, visited))
             {
-                
+                //Debug.Log("up    " );
+                pathsconnected += 1;
             }
-            else if(Down(individual,visited))
+            else if (Down(individual, visited))
             {
-                
+                //Debug.Log("down    " );
+                pathsconnected += 1;
+            }
+            else if (Back(individual, visited, starterposition))
+            {
+                //Debug.Log("Back   " );
             }
             else
             {
-                int index = visited.IndexOf(checkPosition);
-                checkPosition = [index - 1];
+                searchedall = true;
+                if (pathsconnected == width * height - totalShelves)
+                {
+                    //Debug.Log("CONNECTED");
+                }
+                else
+                {
+                    pathssearched += pathsconnected;
+                    //Debug.Log("Disconnected" + pathsconnected);
+                    
+                    pathsections += 1;
+                    foreach(int path in visited){allvisited.Add(path);}
+                    
+                }
 
+                //Debug.Log("searched");
             }
         }
+        }
+        //Debug.Log(pathsections);
+        FitnessScores[generation, individual] += pathsections-1; //Only want to add for each section beyond the minimum of 1.
+    }
+
+
+   
+    bool Back(int individual, List<int> visited, int starterpos)
+    {
+        if (checkPosition != starterpos)
+        {
+            
+            int index = visited.IndexOf(checkPosition);
+            //Debug.Log(checkPosition + "------------------------" + starterpos + "----------------" + index + "--------------------" + visited.IndexOf(checkPosition));
+            index -= 1;
+            checkPosition = visited[index];
+            return true;
+        }
+
+        return false;
+        //go back one on list
     }
     
     bool Right( int individual, List<int> visited)
     {
-
-        if (_oneDLayouts[generation, individual, checkPosition + 1] >= 200000)
+        if (checkPosition % width != width-1)
         {
-            if (!visited.Contains(_oneDLayouts[generation, individual, checkPosition + 1]))
+            if (checkPosition + 1 <= width * height)
             {
-                checkPosition += 1;
-                return true;
+                if (_oneDLayouts[generation, individual, checkPosition + 1] >= 200000) //if its a path to the right
+                {
+
+                    if (!visited.Contains(checkPosition + 1))
+                        //if that path isnt on the list
+                    {
+                        checkPosition += 1;
+                        visited.Add(checkPosition); //add to the list of visited places
+                        return true;
+
+                    }
+                }
             }
         }
 
@@ -765,41 +839,111 @@ public class GeneticAlgorithm : MonoBehaviour
         
     bool Left(int individual, List<int> visited)
     {
-        if (_oneDLayouts[generation, individual, checkPosition - 1] >= 200000)
+        if (checkPosition % width != 0)
         {
-            if (!visited.Contains(_oneDLayouts[generation, individual, checkPosition - 1]))
+            if (checkPosition - 1 >= 0)
             {
-                checkPosition -= 1;
-                return true;
+                if (_oneDLayouts[generation, individual, checkPosition - 1] >= 200000)
+                {
+                    if (!visited.Contains(checkPosition - 1))
+                    {
+                        checkPosition -= 1;
+                        visited.Add(checkPosition);
+                        return true;
+                    }
+                }
             }
         }
+
         return false;
     }
         
     bool Up(int individual, List<int> visited)
     {
-        if (_oneDLayouts[generation, individual, checkPosition + height] >= 200000)
+        if (checkPosition + height <= width * height-1)
         {
-            if (!visited.Contains(_oneDLayouts[generation, individual, checkPosition + height]))
+            if (_oneDLayouts[generation, individual, checkPosition + height] >= 200000)
             {
-                checkPosition += height;
-                return true;
+                if (!visited.Contains(checkPosition+height))
+                {
+                    checkPosition += height;
+                    visited.Add(checkPosition);
+                    return true;
+                }
             }
         }
+
         return false;
     }
         
     bool Down( int individual, List<int> visited)
     {
-        if (_oneDLayouts[generation, individual, checkPosition - height] >= 200000)
+        if (checkPosition >= width)
         {
-            if (!visited.Contains(_oneDLayouts[generation, individual, checkPosition - height]))
+            if (_oneDLayouts[generation, individual, checkPosition - height] >= 200000)
             {
-                checkPosition -= height;
-                return true;
+                if (!visited.Contains(checkPosition-height))
+                {
+                    checkPosition -= height;
+                    visited.Add(checkPosition);
+                    return true;
+                }
             }
         }
+
         return false;
+    }
+    
+    void ShelfFitness(int generation, int individual)
+    {
+        
+        for (int x =  0; x < width*height; x++)
+        {
+            int adjacentpaths = 0;
+            //Debug.Log(x);
+            if (_oneDLayouts[generation, individual, x] < 200000)       //is a shelf
+            {
+                if (x + 1 < width*height && x % width!= width-1)
+                {
+                    if (!(_oneDLayouts[generation, individual, x + 1] < 200000))  //is a shelf
+                    {
+                        adjacentpaths += 1;
+                        //Debug.Log("r");
+                    }
+                }
+                if (x - 1 >= 0 && x % width !=0)
+                {
+                    if (!(_oneDLayouts[generation, individual, x - 1] < 200000))  //is a shelf
+                    {
+                        adjacentpaths += 1;
+                        //Debug.Log("l");
+                    }
+                }
+                if (x + width < width*height)
+                {
+                    //Debug.Log(x+width);
+                    if (!(_oneDLayouts[generation, individual, x + width] < 200000))  //is a shelf
+                    {
+                        adjacentpaths += 1;
+                        //Debug.Log("up");
+                    }
+                }
+                if (x - width >= 0)
+                {
+                    if (!(_oneDLayouts[generation, individual, x - width] < 200000))  //is a shelf
+                    {
+                        adjacentpaths += 1;
+                        //Debug.Log("down");
+                    }
+                }
+
+                if (adjacentpaths == 0)
+                {
+                    FitnessScores[generation, individual] += 1;
+                }
+            }
+        }
+        //Debug.Log(FitnessScores[generation,individual]);
     }
 }
 

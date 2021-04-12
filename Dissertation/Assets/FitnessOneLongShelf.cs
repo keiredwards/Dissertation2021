@@ -34,10 +34,10 @@ public class FitnessOneLongShelf : MonoBehaviour
             AddtoFitness(1);
         }
         
-        if(Physics.Raycast(transform.position, transform.TransformDirection(new Vector3(2,0,2)), out hit, 2f))
-        {
-            AddtoFitness(1);
-        }
+      //  if(Physics.Raycast(transform.position, transform.TransformDirection(new Vector3(2,0,2)), out hit, 2f))
+    //    {
+    //        AddtoFitness(1);
+     //   }
         GeneticAlgorithm.shelvesChecked[_generation] += 1;
     
     }
