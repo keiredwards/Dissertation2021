@@ -58,9 +58,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\BruteForce.cs" />
      <Compile Include="Assets\FitnessOneLongShelf.cs" />
      <Compile Include="Assets\GeneticAlgorithm.cs" />
      <Compile Include="Assets\Scripts\SimpleCameraController.cs" />
+     <Compile Include="Assets\ShelfPlacementCheck.cs" />
+     <Compile Include="Assets\ShelfPlacementCheckRight.cs" />
      <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
  <Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary">
  <HintPath>C:/Users/KeirE/Documents/GitHub/Dissertation2021/Dissertation/Library/ScriptAssemblies/Unity.RenderPipeline.Universal.ShaderLibrary.dll</HintPath>

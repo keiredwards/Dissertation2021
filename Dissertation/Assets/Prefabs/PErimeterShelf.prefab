@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6434225063450004647}
   - component: {fileID: 2192342569632117073}
   - component: {fileID: 1624499783329229040}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: PErimeterShelf
   m_TagString: Untagged
   m_Icon: {fileID: 0}
