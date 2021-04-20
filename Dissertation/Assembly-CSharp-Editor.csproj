@@ -58,6 +58,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\SWS\Scripts\Editor\AboutSWSEditor.cs" />
+     <Compile Include="Assets\SWS\Scripts\Editor\BezierPathEditor.cs" />
+     <Compile Include="Assets\SWS\Scripts\Editor\CreateWPManager.cs" />
+     <Compile Include="Assets\SWS\Scripts\Editor\PathEditor.cs" />
+     <Compile Include="Assets\SWS\Scripts\Editor\ReviewWindowEditor.cs" />
+     <Compile Include="Assets\SWS\Scripts\Editor\WaypointEditor.cs" />
+     <Compile Include="Assets\SWS\Scripts\Editor\moveEditor.cs" />
+     <Compile Include="Assets\SWS\Scripts\Editor\navMoveEditor.cs" />
+     <Compile Include="Assets\SWS\Scripts\Editor\splineMoveEditor.cs" />
      <Compile Include="Assets\TutorialInfo\Scripts\Editor\ReadmeEditor.cs" />
  <Reference Include="UnityEditor.TestRunner">
  <HintPath>C:/Users/KeirE/Documents/GitHub/Dissertation2021/Dissertation/Library/ScriptAssemblies/UnityEditor.TestRunner.dll</HintPath>
@@ -310,6 +319,12 @@
  </Reference>
  <Reference Include="ICSharpCode.NRefactory">
  <HintPath>C:/Users/KeirE/Documents/GitHub/Dissertation2021/Dissertation/Library/PackageCache/com.unity.render-pipelines.core@7.5.3/Editor/ShaderGenerator/ICSharpCode.NRefactory.dll</HintPath>
+ </Reference>
+ <Reference Include="DOTween">
+ <HintPath>C:/Users/KeirE/Documents/GitHub/Dissertation2021/Dissertation/Assets/SWS/Extensions/DOTween/DOTween.dll</HintPath>
+ </Reference>
+ <Reference Include="DOTweenEditor">
+ <HintPath>C:/Users/KeirE/Documents/GitHub/Dissertation2021/Dissertation/Assets/SWS/Extensions/DOTween/Editor/DOTweenEditor.dll</HintPath>
  </Reference>
  <Reference Include="nunit.framework">
  <HintPath>C:/Users/KeirE/Documents/GitHub/Dissertation2021/Dissertation/Library/PackageCache/com.unity.ext.nunit@1.0.6/net35/unity-custom/nunit.framework.dll</HintPath>

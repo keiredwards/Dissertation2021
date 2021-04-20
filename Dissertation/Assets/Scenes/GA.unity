@@ -255,7 +255,7 @@ PrefabInstance:
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
       propertyPath: width
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
@@ -265,7 +265,7 @@ PrefabInstance:
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
       propertyPath: height
-      value: 10
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
@@ -286,13 +286,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
+      propertyPath: RandomSelect
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
+      propertyPath: RouletteWheel
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
       propertyPath: MaxGenerations
       value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
       propertyPath: MutationChance
-      value: 1
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
@@ -303,32 +313,47 @@ PrefabInstance:
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
       propertyPath: SocialDistance
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
-        type: 3}
-      propertyPath: maxGenerations
-      value: 2000000
-      objectReference: {fileID: 0}
-    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
-        type: 3}
-      propertyPath: populationSize
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
-        type: 3}
-      propertyPath: SinglePointCrossOver
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
+      propertyPath: maxGenerations
+      value: 5000
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
+      propertyPath: populationSize
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
+      propertyPath: TruncatedSelect
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
+      propertyPath: pathFitnessmult
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
+      propertyPath: SinglePointCrossOver
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
       propertyPath: oneLengthShelvesCount
-      value: 16
+      value: 56
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
       propertyPath: PartiallyMappedCrossover
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
+      propertyPath: ParentSelectionPercentage
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207441, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}

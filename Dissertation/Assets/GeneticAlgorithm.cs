@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
 
 
 public class GeneticAlgorithm : MonoBehaviour
@@ -9,17 +11,22 @@ public class GeneticAlgorithm : MonoBehaviour
     public static int[] shelvesChecked;
     public float MutationChance;
     public int width;
-    public float bestLayout = Mathf.Infinity;
-    public GameObject Camera;
-    public GameObject PerimeterShelf;
+    private float bestLayout = Mathf.Infinity;
+    private GameObject Camera;
+
     public int framerate;
     public bool SinglePointCrossOver;
     public bool PartiallyMappedCrossover;
+    public bool RouletteWheel;
+    public bool TruncatedSelect;
+    public bool RandomSelect;
     private int bestLayoutIndividual;
     private int bestLayoutGeneration;
     public int SocialDistance;
+    public float ParentSelectionPercentage;
+    public float pathFitnessmult; 
 
-        [FormerlySerializedAs("Height")] public int height;
+    [FormerlySerializedAs("Height")] public int height;
 
     [FormerlySerializedAs("OneLengthShelvesCount")]
     public int oneLengthShelvesCount;
@@ -36,25 +43,27 @@ public class GeneticAlgorithm : MonoBehaviour
     public GameObject path;
     public GameObject camShelf;
     public GameObject camPath;
+    public GameObject PerimeterShelf;
     public int generation;
-    
+
     private static int[,,] _oneDLayouts;
     private static int[,,] _parentIndexes;
     public static int[,] FitnessScores;
+    private bool complete = false;
 
     bool genMax = false;
-    public int checkPosition = 0;
+    private int checkPosition = 0;
     System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
 
     private void Start()
     {
-        
+
         Application.targetFrameRate = framerate;
         //Debug.Log(width + "WIDTHHHHHHHHHHHHHHHHHH");
         //Debug.Log(shelvesChecked[0]);
-       
+
         Init();
-        
+
     }
 
     void Init()
@@ -62,7 +71,7 @@ public class GeneticAlgorithm : MonoBehaviour
         generation = 0;
         totalShelves = populationSize * oneLengthShelvesCount;
         _oneDLayouts = new int[maxGenerations, populationSize, width * height];
-        _parentIndexes = new int[maxGenerations, populationSize,2];
+        _parentIndexes = new int[maxGenerations, populationSize, 2];
         FitnessScores = new int[maxGenerations, populationSize];
         shelvesChecked = new int[maxGenerations];
 
@@ -70,42 +79,45 @@ public class GeneticAlgorithm : MonoBehaviour
         level.transform.position = new Vector3(-100, 0, 0);
         level.name = "Best";
         generation = 0;
-        
+
         //CreateFitnessScores(FitnessScores);
-        
+
         GenerateNewLayout();
-        FindBestLayout( _oneDLayouts, 0);
+        FindBestLayout(_oneDLayouts, 0);
     }
 
 
     private void Update()
     {
-        if ( generation < maxGenerations-1 && bestLayout>0)
+        if (generation < maxGenerations - 1 && bestLayout > 0)
         {
             //Debug.Log("run");
             generation++;
             //Debug.Log("gen:  " + generation);
 
             Run(generation);
-                
+
         }
         else if (generation == maxGenerations)
         {
             Debug.Log("HALT THERE!!");
         }
-        else if (bestLayout == 0)
+        else if (bestLayout == 0 && complete == false)
         {
-            Debug.Log("VICTORY");
-        }
-        GenerateBest(bestLayoutGeneration, bestLayoutIndividual);
-         //Debug.Log("shelves checked :  " + shelvesChecked[generation]);
+            Debug.Log("VICTORY  " + generation);
+            complete = true;
 
-         
+        }
+
+        GenerateBest(bestLayoutGeneration, bestLayoutIndividual);
+        //Debug.Log("shelves checked :  " + shelvesChecked[generation]);
+
+
     }
 
     void Main()
     {
-        
+
     }
 
     private static void Main(string[] args)
@@ -139,10 +151,10 @@ public class GeneticAlgorithm : MonoBehaviour
                     x++) //Create Empty 2d Array Representing Shop Floor of only Paths where 0 is a path.
                 for (var y = 0; y < width; y++)
                 {
-                    _oneDLayouts[generation, individual, y + x * width] = 200000;   //sets all to path
+                    _oneDLayouts[generation, individual, y + x * width] = 200000; //sets all to path
                     FitnessScores[generation, individual] = 0;
                     shelvesChecked[generation] = 0;
-                    
+
                 }
 
             }
@@ -150,7 +162,7 @@ public class GeneticAlgorithm : MonoBehaviour
 
         for (int generation = 0; generation < maxGenerations; generation++)
         {
-            
+
         }
         //Debug.Log(_oneDLayouts[1, 1, 1]);
         //Debug.Log(Layouts[2, 2, 0, 0]);
@@ -162,22 +174,23 @@ public class GeneticAlgorithm : MonoBehaviour
             var posx = Random.Range(0, width);
             var posy = Random.Range(0, height);
 
-            while (_oneDLayouts[0, individual, posy * width + posx] < 200000) //If the position generated is another shelf (i.e under 200k, generate a new pos)
+            while (_oneDLayouts[0, individual, posy * width + posx] < 200000
+            ) //If the position generated is another shelf (i.e under 200k, generate a new pos)
             {
                 posx = Random.Range(0, width);
                 posy = Random.Range(0, height);
             }
 
-            _oneDLayouts[0, individual, posy * width + posx] = 10000+x;
+            _oneDLayouts[0, individual, posy * width + posx] = 10000 + x;
         }
-        
+
         //fixing shelf and path numbering
-        
+
         for (var individual = 0; individual < populationSize; individual++)
         {
             int shelves = 0;
             int paths = 0;
-            
+
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
@@ -204,12 +217,13 @@ public class GeneticAlgorithm : MonoBehaviour
     {
         for (var individual = 0; individual < populationSize; individual++)
         {
-            
+
             //Debug.Log("gen" + generation);
             FitnessScores[generation, individual] = 0;
-            DisplayLayout(individual, generation);
-            ShelfFitness(generation,individual);
-            CheckValidity(0,individual);
+            //DisplayLayout(individual, generation);
+
+            CheckValidity(0, individual);
+            ShelfFitness(0, individual);
         }
     }
 
@@ -251,7 +265,7 @@ public class GeneticAlgorithm : MonoBehaviour
 
 
 
-                
+
 
                 if (_oneDLayouts[generation, individual, x + z * width] < 200000
                 ) //shelves are denoted by <200,000 values
@@ -268,55 +282,115 @@ public class GeneticAlgorithm : MonoBehaviour
                     //Shelf.transform.parent.transform.position = new Vector3(individual * 20, 0, 0);
                 }
 
-                
+
             }
         }
-       
+
     }
 
     private void ChooseParents(int generation, int individual, int Parent)
     {
-        
+
         var generationFitness = 0F;
         var parentNum = -1;
         var scores = new Dictionary<int, float>();
-        Dictionary<int,int> sortedScores = new Dictionary<int, int>();
+        Dictionary<int, int> sortedScores = new Dictionary<int, int>();
         for (var ind = 0; ind < populationSize; ind++)
         {
             //Debug.Log(generation + "  " + ind);
-            float temp = (float) FitnessScores[generation-1, ind];
+            float temp = (float) FitnessScores[generation - 1, ind];
             if (temp == 0)
             {
                 temp = 0.001F;
             }
-           //Debug.Log(FitnessScores[generation, ind]);
-            
+            //Debug.Log(FitnessScores[generation, ind]);
+
             //Debug.Log(temp + "  <<temp");
-            
-            generationFitness += 1/temp;
-            
-            scores.Add( ind, 1/temp);
+
+            generationFitness += 1 / temp;
+
+            scores.Add(ind, 1 / temp);
         }
 
         var fitnessThreshold = Random.Range(0, generationFitness);
         var fitnessCount = 0F;
-        
-        
+
+
         foreach (KeyValuePair<int, float> Fitness in scores.OrderByDescending(key => key.Value))
         {
             //Debug.Log(Fitness.Key + "," + Fitness.Value);
             fitnessCount += Fitness.Value;
-            if (fitnessCount > fitnessThreshold && parentNum== -1)
+            if (fitnessCount > fitnessThreshold && parentNum == -1)
             {
                 parentNum = Fitness.Key;
             }
 
-        }  
-        
+        }
+
         //Debug.Log("parent: " + parentNum + "    FitnessThreshold: " + fitnessThreshold + "  FitnessCount: " + fitnessCount);
         //Debug.Log(_parentIndexes[generation, individual, Parent]);
         //Debug.Log(generation + "ind  " + individual + "parent:   " + Parent + "PARENTNNUM:  " + parentNum);
         _parentIndexes[generation, individual, Parent] = parentNum;
+    }
+
+    void TruncatedSelection(int Generation)
+    {
+        var generationFitness = 0F;
+        var parentNum = -1;
+        var scores = new Dictionary<int, float>();
+        List<int> sortedScores = new List<int> ();
+        for (var ind = 0; ind < populationSize; ind++)
+        {
+            scores.Add(ind, (float) FitnessScores[generation - 1, ind]);
+        }
+
+        var fitnessThreshold = Random.Range(0, generationFitness);
+        var fitnessCount = 0F;
+        float parentCount = ParentSelectionPercentage * populationSize;
+        //Debug.Log(fitnessCount);
+        //Debug.Log(parentCount);
+        
+        foreach (KeyValuePair<int, float> Fitness in scores.OrderBy(key => key.Value))
+        {
+            //Debug.Log(Fitness.Key);     //this is the layout num
+            //Debug.Log(Fitness.Value);   //its fitness value
+            
+            if (fitnessCount < parentCount)
+            {
+                sortedScores.Add(Fitness.Key);
+            }
+
+            fitnessCount += 1;
+        }
+        
+        for (int x = 0; x < sortedScores.Count; x++)        //randomly shuffles the list.
+        {
+            int randompos = UnityEngine.Random.Range(x, sortedScores.Count);
+            var temp = sortedScores[x];
+            sortedScores[x] = sortedScores[randompos];
+            sortedScores[randompos] = temp;
+        }
+
+
+
+        for (int index = 0; index < populationSize; index++)
+        {
+            _parentIndexes[generation, index, 0] = sortedScores[index % sortedScores.Count];
+            _parentIndexes[generation, index, 1] = sortedScores[index * 2 % sortedScores.Count];
+            //Debug.Log(_parentIndexes[generation, index, 0] + "          " + _parentIndexes[generation, index, 1]);
+            //Debug.Log("FITNESS SCORES:     " + FitnessScores[generation-1,_parentIndexes[generation, index, 0]] + "          " + FitnessScores[generation-1,_parentIndexes[generation, index, 1]]);
+        }
+
+    }
+
+    void RandomSelection(int generation)
+    {
+        for (int index = 0; index < populationSize / 2; index++)
+        {
+            _parentIndexes[generation, index, 0] = Random.Range(0, populationSize);
+            _parentIndexes[generation, index, 1] = Random.Range(0, populationSize);
+        }
+        
     }
 
     private void OnePointCrossover(int parent1Num, int parent2Num, int generation, int individual)
@@ -324,18 +398,18 @@ public class GeneticAlgorithm : MonoBehaviour
         //("onpoint");
         var parent1 = new int[width * height];
         var parent2 = new int[width * height];
-        
+
         int[] child1 = new int[width * height];
         int[] child2 = new int[width * height];
-        
-        for (var x = 0; x < width*height; x++)
+
+        for (var x = 0; x < width * height; x++)
         {
             //Debug.Log(x + "," + generation + "," + parent1Num);
-            parent1[x] = _oneDLayouts[generation-1, parent1Num, x];
-            parent2[x] = _oneDLayouts[generation-1, parent2Num, x];
-            
+            parent1[x] = _oneDLayouts[generation - 1, parent1Num, x];
+            parent2[x] = _oneDLayouts[generation - 1, parent2Num, x];
+
             //Debug.Log(generation-1 + "         " + parent1Num +  "       " + x + "parent1[x]:" + parent1[x]);
-            
+
             //Debug.Log("parent1[x]:" + parent1[x] + "  parent2[x]:" + parent2[x]);
 
             child1[x] = 0;
@@ -349,13 +423,13 @@ public class GeneticAlgorithm : MonoBehaviour
             child1[x] = parent2[x];
             child2[x] = parent1[x];
         }
-        
-        for (int x = crossoverpoint1; x < width*height; x++)
+
+        for (int x = crossoverpoint1; x < width * height; x++)
         {
             child1[x] = parent2[x];
             child2[x] = parent1[x];
 
-            
+
             //("Child1[x]: " + child1[x]);
 
         }
@@ -369,58 +443,59 @@ public class GeneticAlgorithm : MonoBehaviour
 
 
     }
+
     private void Pmx(int parent1Num, int parent2Num, int generation, int individual) //Partial-Mapped Crossover
     {
         //Debug.Log("PMX BEGAN  " + individual);
         var parent1 = new int[width * height];
         var parent2 = new int[width * height];
-        
+
         int[] child1 = new int[width * height];
         int[] child2 = new int[width * height];
 
         Dictionary<int, int> RelationshipsOneAsKey = new Dictionary<int, int>();
         Dictionary<int, int> RelationshipsTwoAsKey = new Dictionary<int, int>();
-        
+
         //Debug.Log("new dicts made!!");
-        
-        
-       //Debug.Log(parent1Num);
+
+
+        //Debug.Log(parent1Num);
         //Debug.Log(parent2Num);
         //Debug.Log(generation); 
         //Debug.Log("------------------------Start of Parents ------------------------------");
-       //Debug.Log(parent1Num + "                        " + parent2Num);
-        
-        
-        for (var x = 0; x < width*height; x++)
+        //Debug.Log(parent1Num + "                        " + parent2Num);
+
+
+        for (var x = 0; x < width * height; x++)
         {
             //Debug.Log(x + "," + generation + "," + parent1Num);
-            parent1[x] = _oneDLayouts[generation-1, parent1Num, x];
-            parent2[x] = _oneDLayouts[generation-1, parent2Num, x];
-            
+            parent1[x] = _oneDLayouts[generation - 1, parent1Num, x];
+            parent2[x] = _oneDLayouts[generation - 1, parent2Num, x];
+
             //Debug.Log(generation-1 + "         " + parent1Num +  "       " + x + "parent1[x]:" + parent1[x]);
-            
+
             //Debug.Log("parent1[x]:" + parent1[x] + "  parent2[x]:" + parent2[x]);
 
             child1[x] = 0;
             child2[x] = 0;
         }
-        
+
         //Debug.Log("-------------------------End of Parents -------------------------------");
-        
-        
-        
-        
+
+
+
+
         int crossOverPoint1 = 0;
         int crossOverPoint2 = 0;
-        
-       
 
-        while (crossOverPoint1 == crossOverPoint2)  //generate two points to cut gene that arent the same point
+
+
+        while (crossOverPoint1 == crossOverPoint2) //generate two points to cut gene that arent the same point
         {
-            crossOverPoint1 = Random.Range(0, parent1.Length+1);    //cut points are before selected index. i.e index 3:
-            crossOverPoint2 = Random.Range(0, parent2.Length+1);    // 012|345
+            crossOverPoint1 = Random.Range(0, parent1.Length + 1); //cut points are before selected index. i.e index 3:
+            crossOverPoint2 = Random.Range(0, parent2.Length + 1); // 012|345
         }
-         
+
 
         if (crossOverPoint1 > crossOverPoint2) //Swaps over so 1 is always smaller
         {
@@ -428,24 +503,24 @@ public class GeneticAlgorithm : MonoBehaviour
             crossOverPoint1 = crossOverPoint2;
             crossOverPoint2 = temp;
         }
-        
+
         //Debug.Log(crossOverPoint1 + " " + crossOverPoint2);
-        
+
         //Debug.Log("----------------------Start of Crossover----------------------");
 
         for (int x = crossOverPoint1; x < crossOverPoint2; ++x)
         {
             child1[x] = parent2[x];
             child2[x] = parent1[x];
-            
-           // Debug.Log(parent1[x]);
-           // Debug.Log(parent2[x]);
+
+            // Debug.Log(parent1[x]);
+            // Debug.Log(parent2[x]);
 
             RelationshipsOneAsKey.Add(parent1[x], parent2[x]);
             RelationshipsTwoAsKey.Add(parent2[x], parent1[x]);
         }
-            
-        for (int x = 0; x < width*height; x++)
+
+        for (int x = 0; x < width * height; x++)
         {
             if (x < crossOverPoint2 && x >= crossOverPoint1)
             {
@@ -461,8 +536,8 @@ public class GeneticAlgorithm : MonoBehaviour
                     while (child1.Contains(key))
                     {
                         key = RelationshipsTwoAsKey[
-                            key];  
-                        
+                            key];
+
                         //Debug.Log("parent1[x]>>>>" + parent1[x] + "child1[x]>>>> " + key);
                     }
 
@@ -478,44 +553,44 @@ public class GeneticAlgorithm : MonoBehaviour
                     child1[x] = parent1[x];
                 }
 
-               // if (child2.Contains(parent2[x]))
-              //  {
-                   // child2[x] = RelationshipsOneAsKey[
-                      //  parent2[x]]; //this might need to get value from relationshipstwoaskey instead
-                
+                // if (child2.Contains(parent2[x]))
+                //  {
+                // child2[x] = RelationshipsOneAsKey[
+                //  parent2[x]]; //this might need to get value from relationshipstwoaskey instead
+
 
 
             }
             //Debug.Log(child1[x] + "      " + parent1[x] + "      " + parent2[x]);
 
         }
-        
+
         //Debug.Log("-------------------------Start of Child -------------------------------");
-        
-        for (int x = 0; x < width*height; x++)
+
+        for (int x = 0; x < width * height; x++)
         {
             _oneDLayouts[generation, individual, x] = child1[x];
-                //Debug.Log("Child1[x]: " + child1[x]);
-            }
-        
-        
+            //Debug.Log("Child1[x]: " + child1[x]);
+        }
+
+
         //Debug.Log("-------------------------End of Child -------------------------------");
 
-    
+
     }
 
     void SwapMutation(int generation, int individual)
     {
 
-            int x = Random.Range(0, width * height);
-            int y = Random.Range(0, width * height);
+        int x = Random.Range(0, width * height);
+        int y = Random.Range(0, width * height);
 
-            int temp = _oneDLayouts[generation, individual, x];
+        int temp = _oneDLayouts[generation, individual, x];
 
-            //Debug.Log(x + "   " + y);
-            _oneDLayouts[generation, individual, x] = _oneDLayouts[generation, individual, y];
-            _oneDLayouts[generation, individual, y] = temp;
-        }
+        //Debug.Log(x + "   " + y);
+        _oneDLayouts[generation, individual, x] = _oneDLayouts[generation, individual, y];
+        _oneDLayouts[generation, individual, y] = temp;
+    }
 
 
     void ClearLayouts()
@@ -540,16 +615,16 @@ public class GeneticAlgorithm : MonoBehaviour
         oldbest.name = "oldbest";
         oldbest.transform.position = new Vector3(1000, 0, 0);
         Destroy(oldbest);
-        
-        
-        
-        
-        
+
+
+
+
+
         var level = new GameObject();
         level.transform.position = new Vector3(-100, 0, 0);
         level.name = "Best";
-        
-        
+
+
         for (var x = -1; x < width + 1; x++)
         {
 
@@ -558,47 +633,49 @@ public class GeneticAlgorithm : MonoBehaviour
                 if (x == -1 || x == width || z == -1 || z == height)
                 {
                     var shelf = Instantiate(PerimeterShelf,
-                        new Vector3(x -100 , 0.5f, z - 100),
+                        new Vector3(x - 100, 0.5f, z - 100),
                         Quaternion.identity);
                     shelf.transform.parent = GameObject.Find("Best").transform;
-                    
+
                 }
             }
         }
-        
+
         for (var x = 0; x < width; x++) //Place Paths and Shelves Appropriately
-        for (var z = 0; z < height; z++) 
-            if (_oneDLayouts[generation, individual, x + z*width] >= 200000)    //paths are denoted by 200,000+ values
+        for (var z = 0; z < height; z++)
+            if (_oneDLayouts[generation, individual, x + z * width] >= 200000) //paths are denoted by 200,000+ values
             {
                 var path = Instantiate(camPath, new Vector3(x + -100, 0, z + -100),
                     Quaternion.identity);
                 path.transform.parent = GameObject.Find("Best").transform;
                 path.name = _oneDLayouts[bestLayoutGeneration, bestLayoutIndividual, x + z * width].ToString();
             }
-            else if (_oneDLayouts[generation, individual, x + z*width] < 200000) //shelves are denoted by <200,000 values
+            else if (_oneDLayouts[generation, individual, x + z * width] < 200000
+            ) //shelves are denoted by <200,000 values
             {
                 var shelf = Instantiate(camShelf, new Vector3(x + -100, 0.5f, z + -100),
                     Quaternion.identity);
                 shelf.transform.parent = GameObject.Find("Best").transform;
                 shelf.name = _oneDLayouts[bestLayoutGeneration, bestLayoutIndividual, x + z * width].ToString();
-                
+
                 //Shelf.transform.parent.transform.position = new Vector3(individual * 20, 0, 0);
             }
     }
+
     public void Run(int generation)
     {
         //Debug.Log("A NEW GENERATION");
-        
+
         //ClearLayouts();
-          
-        
-        int averageFitness = 0;
+
+
+        float averageFitness = 0;
         if (generation > 0)
         {
             for (int individual = 0; individual < populationSize; individual++)
             {
 
-                
+
                 averageFitness += FitnessScores[generation - 1, individual];
                 if (FitnessScores[generation - 1, individual] < bestLayout)
                 {
@@ -606,18 +683,19 @@ public class GeneticAlgorithm : MonoBehaviour
                     bestLayout = FitnessScores[generation - 1, individual];
                     bestLayoutGeneration = generation - 1;
                     bestLayoutIndividual = individual;
-                   Debug.Log(bestLayout + "gen:" + generation + "  indv:" + individual);
-                    
+                    Debug.Log(bestLayout + "gen:" + generation + "  indv:" + individual);
+
                 }
             }
         }
         else
         {
-            averageFitness = 100;
+            averageFitness = 100f;
         }
         
         
-        
+        //Debug.Log("average fitness:         " + averageFitness/populationSize);
+
         //Debug.Log(averageFitness);
 
         if (bestLayout == 0)
@@ -626,20 +704,34 @@ public class GeneticAlgorithm : MonoBehaviour
         }
         else
         {
-            
-            for (int individual = 0; individual < populationSize; individual++) //2 parents for each individual
+
+
+            if (RouletteWheel == true)
             {
-                
-                ChooseParents( generation, individual, 0);
-                
-                ChooseParents( generation, individual, 1);
+
+                for (int individual = 0; individual < populationSize; individual++) //2 parents for each individual
+                {
+
+                    ChooseParents(generation, individual, 0);
+
+                    ChooseParents(generation, individual, 1);
+                }
             }
-            
-            
+            else if (TruncatedSelect == true)
+            {
+                //Debug.Log("truncated Selection");
+                TruncatedSelection(generation);
+            }
+            else if (RandomSelect == true)
+            {
+                RandomSelection(generation);
+            }
+
+
             for (int individual = 0; individual < populationSize; individual++) //2 parents for each individual
             {
-                
-                
+
+
                 int parent1Num = _parentIndexes[generation, individual, 0];
                 int parent2Num = _parentIndexes[generation, individual, 1];
                 //Debug.Log(_parentIndexes[generation, individual] + "" + _parentIndexes[generation, individual+populationSize]);
@@ -647,35 +739,35 @@ public class GeneticAlgorithm : MonoBehaviour
                 {
                     Pmx(parent1Num, parent2Num, generation, individual);
                 }
-                else if(SinglePointCrossOver == true)
+                else if (SinglePointCrossOver == true)
                 {
                     OnePointCrossover(parent1Num, parent2Num, generation, individual);
                 }
 
-                  
-                
-                
+
+
+
                 int MutationRoll = Random.Range(0, 1);
                 if (MutationRoll <= MutationChance)
                 {
                     //Debug.Log("mutate");
                     SwapMutation(generation, individual);
                 }
-                
-                
-                CheckValidity(generation,individual);
+
+
+                CheckValidity(generation, individual);
                 ShelfFitness(generation, individual);
                 //DisplayLayout(individual, generation);
-                
-                
+
+
             }
-            
-            
+
+
         }
-        
-            
+
+
     }
-    
+
 
     void CheckValidity(int generation, int individual)
     {
@@ -687,91 +779,98 @@ public class GeneticAlgorithm : MonoBehaviour
         int pathssearched = 0;
         int pathsections = 0;
         //Debug.Log(pathssearched<width*height-totalShelves);
-        while(pathssearched<width*height-oneLengthShelvesCount){
+        while (pathssearched < width * height - oneLengthShelvesCount)
+        {
             //Debug.Log("here");
             List<int> visited = new List<int>();
             bool pathfound = false;
             int x = 0;
             int pathsconnected = 0;
-            
+
             bool searchedall = false;
-            
-        while (pathfound == false)
-        {
-            
-            if (_oneDLayouts[generation, individual, x] >= 200000 && !(allvisited.Contains(x)))
-            {
-                pathfound = true;
-                checkPosition = x;
-                visited.Add(checkPosition);
-                //Debug.Log(checkPosition);
-                pathsconnected += 1;
-                
-            }
 
-            x++;
-        }
+            while (pathfound == false)
+            {
 
-        int starterposition = checkPosition;
-        
-        while (searchedall == false)
-        {
-            //Debug.Log(checkPosition);
-            if (Right(individual, visited))
-            { //Debug.Log("right     " );
-                pathsconnected += 1;
-            }
-            else if (Left(individual, visited))
-            {
-                //Debug.Log("left    " );
-                pathsconnected += 1;
-            }
-            else if (Up(individual, visited))
-            {
-                //Debug.Log("up    " );
-                pathsconnected += 1;
-            }
-            else if (Down(individual, visited))
-            {
-                //Debug.Log("down    " );
-                pathsconnected += 1;
-            }
-            else if (Back(individual, visited, starterposition))
-            {
-                //Debug.Log("Back   " );
-            }
-            else
-            {
-                searchedall = true;
-                if (pathsconnected == width * height - totalShelves)
+                if (_oneDLayouts[generation, individual, x] >= 200000 && !(allvisited.Contains(x)))
                 {
-                    //Debug.Log("CONNECTED");
+                    pathfound = true;
+                    checkPosition = x;
+                    visited.Add(checkPosition);
+                    //Debug.Log(checkPosition);
+                    pathsconnected += 1;
+
+                }
+
+                x++;
+            }
+
+            int starterposition = checkPosition;
+
+            while (searchedall == false)
+            {
+                //Debug.Log(checkPosition);
+                if (Right(individual, visited))
+                {
+                    //Debug.Log("right     " );
+                    pathsconnected += 1;
+                }
+                else if (Left(individual, visited))
+                {
+                    //Debug.Log("left    " );
+                    pathsconnected += 1;
+                }
+                else if (Up(individual, visited))
+                {
+                    //Debug.Log("up    " );
+                    pathsconnected += 1;
+                }
+                else if (Down(individual, visited))
+                {
+                    //Debug.Log("down    " );
+                    pathsconnected += 1;
+                }
+                else if (Back(individual, visited, starterposition))
+                {
+                    //Debug.Log("Back   " );
                 }
                 else
                 {
-                    pathssearched += pathsconnected;
-                    //Debug.Log("Disconnected" + pathsconnected);
-                    
-                    pathsections += 1;
-                    foreach(int path in visited){allvisited.Add(path);}
+                    searchedall = true;
+                    if (pathsconnected == width * height - totalShelves)
+                    {
+                        //Debug.Log("CONNECTED");
+                    }
+                    else
+                    {
+                        pathssearched += pathsconnected;
+                        //Debug.Log("Disconnected" + pathsconnected);
+
+                        pathsections += 1;
+                        foreach (int path in visited)
+                        {
+                            allvisited.Add(path);
+                        }
+
+                    }
+
                     
                 }
-
-                //Debug.Log("searched");
             }
         }
-        }
-        //Debug.Log(pathsections);
-        FitnessScores[generation, individual] += pathsections-1; //Only want to add for each section beyond the minimum of 1.
+
+        //Debug.Log("searched");
+        //Debug.Log("path sections:  " + pathsections);
+        FitnessScores[generation, individual] += (int) ((pathsections - 1)* pathFitnessmult); //Only want to add for each section beyond the minimum of 1.
     }
 
 
-   
+
     bool Back(int individual, List<int> visited, int starterpos)
     {
         if (checkPosition != starterpos)
         {
-            
+
             int index = visited.IndexOf(checkPosition);
             //Debug.Log(checkPosition + "------------------------" + starterpos + "----------------" + index + "--------------------" + visited.IndexOf(checkPosition));
             index -= 1;
@@ -782,10 +881,10 @@ public class GeneticAlgorithm : MonoBehaviour
         return false;
         //go back one on list
     }
-    
-    bool Right( int individual, List<int> visited)
+
+    bool Right(int individual, List<int> visited)
     {
-        if (checkPosition % width != width-1)
+        if (checkPosition % width != width - 1)
         {
             if (checkPosition + 1 <= width * height)
             {
@@ -806,7 +905,7 @@ public class GeneticAlgorithm : MonoBehaviour
 
         return false;
     }
-        
+
     bool Left(int individual, List<int> visited)
     {
         if (checkPosition % width != 0)
@@ -827,14 +926,15 @@ public class GeneticAlgorithm : MonoBehaviour
 
         return false;
     }
-        
+
     bool Up(int individual, List<int> visited)
     {
-        if (checkPosition + width < width * height) //if moving up one block wouldnt go beyond array limits of width * height
+        if (checkPosition + width < width * height
+        ) //if moving up one block wouldnt go beyond array limits of width * height
         {
             if (_oneDLayouts[generation, individual, checkPosition + width] >= 200000)
             {
-                if (!visited.Contains(checkPosition+width))
+                if (!visited.Contains(checkPosition + width))
                 {
                     checkPosition += width;
                     visited.Add(checkPosition);
@@ -845,14 +945,14 @@ public class GeneticAlgorithm : MonoBehaviour
 
         return false;
     }
-        
-    bool Down( int individual, List<int> visited)
+
+    bool Down(int individual, List<int> visited)
     {
         if (checkPosition >= width) //if the current position is not on the bottom row. i.e all values up to width
         {
             if (_oneDLayouts[generation, individual, checkPosition - width] >= 200000)
             {
-                if (!visited.Contains(checkPosition-width))
+                if (!visited.Contains(checkPosition - width))
                 {
                     checkPosition -= width;
                     visited.Add(checkPosition);
@@ -863,84 +963,125 @@ public class GeneticAlgorithm : MonoBehaviour
 
         return false;
     }
-    
+
     void ShelfFitness(int generation, int individual)
     {
-        
-        for (int x =  0; x < width*height; x++)
+
+        for (int x = 0; x < width * height; x++)
         {
             int adjacentpaths = 0;
             int adjacentpathsL = 0;
             int adjacentpathsR = 0;
             int adjacentpathsU = 0;
             int adjacentpathsD = 0;
+            bool blockedL = false;
+            bool blockedR = false;
+            bool blockedU = false;
+            bool blockedD = false;
             //Debug.Log(x);
-            
-            for( int distance = 1; distance<=SocialDistance; distance++)
-            if (_oneDLayouts[generation, individual, x] < 200000)       //is a shelf
+
+            if (_oneDLayouts[generation, individual, x] < 200000) //is a shelf
             {
-                if (x + distance < width*height && width> distance + (x%width))
+                for (int distance = 1; distance <= SocialDistance; distance++)
                 {
-                    if (!(_oneDLayouts[generation, individual, x + distance] < 200000))  //is a shelf
+                    if (x + distance < width * height && width > distance + (x % width))
                     {
-                        adjacentpathsR += 1;
-                        //Debug.Log("r");
+                        if (!(_oneDLayouts[generation, individual, x + distance] < 200000)) //is a shelf
+                        {
+                            adjacentpathsR += 1;
+                            //Debug.Log("r");
+                        }
+                        else
+                        {
+                            blockedL = true;
+                        }
                     }
-                }
-                if (x - distance >= 0 && x % width <= distance)
-                {
-                    if (!(_oneDLayouts[generation, individual, x - distance] < 200000))  //is a shelf
-                    {
-                        adjacentpathsL += 1;
-                        //Debug.Log("l");
-                    }
-                }
-                if (x + width*distance < width*height)
-                {
-                    //Debug.Log(x+width);
-                    if (!(_oneDLayouts[generation, individual, x + width*distance] < 200000))  //is a shelf
-                    {
-                        adjacentpathsU += 1;
-                        //Debug.Log("up");
-                    }
-                }
-                if (x - width*distance >= 0)
-                {
-                    if (!(_oneDLayouts[generation, individual, x - width*distance] < 200000))  //is a shelf
-                    {
-                        adjacentpathsD += 1;
-                        //Debug.Log("down");
-                    }
-                }
 
-                if ((adjacentpathsL < distance)&&(adjacentpathsR < distance)&&(adjacentpathsU < distance)&&(adjacentpathsD < distance))
-                {
-                    FitnessScores[generation, individual] += 1;
-                }
+                    if (x - distance >= 0 && x % width >= distance)
+                    {
+                        //Debug.Log("space to left");
+                        if ((_oneDLayouts[generation, individual, x - distance] >= 200000)) //is a shelf
+                        {
+                            adjacentpathsL += 1;
+                            //Debug.Log("l");
+                        }
+                        else
+                        {
+                            blockedR = true;
+                        }
+                    }
 
-                if (adjacentpathsL < distance && adjacentpathsL > 0)
+                    if (x + width * distance < width * height)
+                    {
+                        //Debug.Log(x+width);
+                        if (!(_oneDLayouts[generation, individual, x + width * distance] < 200000)) //is a shelf
+                        {
+                            adjacentpathsU += 1;
+                            //Debug.Log("up");
+                        }
+                        else
+                        {
+                            blockedU = true;
+                        }
+                    }
+
+                    if (x - width * distance >= 0)
+                    {
+                        if (!(_oneDLayouts[generation, individual, x - width * distance] < 200000)) //is a shelf
+                        {
+                            adjacentpathsD += 1;
+                            //Debug.Log("down");
+                        }
+                        else
+                        {
+                            blockedD = true;
+                        }
+                    }
+
+                    
+                /*
+
+                    if (adjacentpathsL < SocialDistance && adjacentpathsL > 0
+                    ) //if a side is open but the gap is less than the distance
+                    {
+                        FitnessScores[generation, individual] += 1;
+                    }
+
+                    if (adjacentpathsR < SocialDistance && adjacentpathsR > 0)
+                    {
+                        FitnessScores[generation, individual] += 1;
+                    }
+
+                    if (adjacentpathsU < SocialDistance && adjacentpathsU > 0)
+                    {
+                         FitnessScores[generation, individual] += 1;
+                    }
+
+                    if (adjacentpathsD < SocialDistance && adjacentpathsD > 0)
+                    {
+                          FitnessScores[generation, individual] += 1;
+                    }
+                    
+                    */
+
+    
+                }
+                if ((adjacentpathsL < SocialDistance) && (adjacentpathsR < SocialDistance) && (adjacentpathsU < SocialDistance) && (adjacentpathsD < SocialDistance)) // if no sides are open
                 {
                     FitnessScores[generation, individual] += 1;
-                }
-                
-                if (adjacentpathsR < distance && adjacentpathsR > 0)
-                {
-                    FitnessScores[generation, individual] += 1;
-                }
-                
-                if (adjacentpathsU < distance && adjacentpathsU > 0)
-                {
-                    FitnessScores[generation, individual] += 1;
-                }
-                
-                if (adjacentpathsD < distance && adjacentpathsD > 0)
-                {
-                    FitnessScores[generation, individual] += 1;
-                }
-                
-            }
+                    //Debug.Log(x);
+                    //Debug.Log(_oneDLayouts[generation,individual, x]);
+                    //Debug.Log(adjacentpathsL + "         " + adjacentpathsR + "        " + adjacentpathsU + "           " + adjacentpathsD); 
+                    
+
+                } 
+                              
+            } 
+
+            
         }
-        //Debug.Log(FitnessScores[generation,individual]);
+        //Debug.Log(FitnessScores[generation, individual]);
+        
     }
 }
 
