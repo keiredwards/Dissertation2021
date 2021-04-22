@@ -141,17 +141,17 @@ PrefabInstance:
     - target: {fileID: 2530488676472094503, guid: 3a015d0606287af4885612f007d48a0f,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -96
+      value: -93.29
       objectReference: {fileID: 0}
     - target: {fileID: 2530488676472094503, guid: 3a015d0606287af4885612f007d48a0f,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 50
+      value: 13.25
       objectReference: {fileID: 0}
     - target: {fileID: 2530488676472094503, guid: 3a015d0606287af4885612f007d48a0f,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -98
+      value: -96.9
       objectReference: {fileID: 0}
     - target: {fileID: 2530488676472094503, guid: 3a015d0606287af4885612f007d48a0f,
         type: 3}
@@ -328,7 +328,7 @@ PrefabInstance:
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
       propertyPath: pathWidthCheck
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
@@ -353,7 +353,7 @@ PrefabInstance:
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
       propertyPath: oneLengthShelvesCount
-      value: 52
+      value: 53
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
