@@ -169,7 +169,13 @@ namespace SWS
             if (moveToPath)
                 StartCoroutine(NextWaypoint());
             else
+            {
+                if (startPoint < 0)
+                {
+                    startPoint = 0;
+                }
                 GoToWaypoint(startPoint);
+            }
 
             moveToPath = false;
         }

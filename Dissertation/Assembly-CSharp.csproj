@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\BruteForce.cs" />
+     <Compile Include="Assets\Counter.cs" />
      <Compile Include="Assets\FitnessOneLongShelf.cs" />
      <Compile Include="Assets\GeneticAlgorithm.cs" />
      <Compile Include="Assets\SWS\Examples\Scripts\CameraInputDemo.cs" />
@@ -80,6 +81,7 @@
      <Compile Include="Assets\SWS\Scripts\Helper\PathIndicator.cs" />
      <Compile Include="Assets\SWS\Scripts\Helper\PathRenderer.cs" />
      <Compile Include="Assets\SWS\Scripts\Manager\BezierPathManager.cs" />
+     <Compile Include="Assets\SWS\Scripts\Manager\GeneratePath.cs" />
      <Compile Include="Assets\SWS\Scripts\Manager\PathManager.cs" />
      <Compile Include="Assets\SWS\Scripts\Manager\WaypointManager.cs" />
      <Compile Include="Assets\SWS\Scripts\Movement\navMove.cs" />
@@ -87,6 +89,7 @@
      <Compile Include="Assets\Scripts\SimpleCameraController.cs" />
      <Compile Include="Assets\ShelfPlacementCheck.cs" />
      <Compile Include="Assets\ShelfPlacementCheckRight.cs" />
+     <Compile Include="Assets\SocialDistanceCheck.cs" />
      <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
      <None Include="Assets\SWS\README.txt" />
      <None Include="Assets\SWS\Changelog.txt" />

@@ -16,14 +16,29 @@ public class BruteForce : MonoBehaviour
     public GameObject LeftShelf;
 
     public GameObject RightShelf;
+
+    public bool Uniform;
+    public int[] Heights;
+
+    public int height;
     // Start is called before the first frame update
     void Start()
     {
         _layout = new int[width][];
         for (int x = 0; x < width; x++)
         {
-            _layout[x] = new int[10];
+            if (Uniform == false)
+            {
+                _layout[x] = new int[Heights[x]];
+            }
+            else
+            {
+                _layout[x] = new int[height];
+            }
         }
+
+        GameObject Layout = new GameObject();
+        Layout.name = "Layout";
 
         BuildPerimeter();
 
@@ -39,17 +54,20 @@ public class BruteForce : MonoBehaviour
 
     void BuildPerimeter()
     {
+        var Layout = GameObject.Find("Layout");
         for (int z = 0; z < width; z++)
         {
             for (int x = 0; x < _layout[z].Length; x++)
             {
                 if (z == 0 || z == width-1 || x == 0 || x == _layout[z].Length-1)
                 {
-                    Instantiate(Shelf, new Vector3(z, 0, x), Quaternion.identity);
+                    var ShelfObject = Instantiate(Shelf, new Vector3(z, 0, x), Quaternion.identity);
+                    ShelfObject.transform.parent = Layout.transform;
                 }
                 else
                 {
-                    Instantiate(Path, new Vector3(z, -0.5f, x), Quaternion.identity);
+                    var PathObject = Instantiate(Path, new Vector3(z, -0.5f, x), Quaternion.identity);
+                    PathObject.transform.parent = Layout.transform;
                 }
             }
         }
@@ -68,7 +86,7 @@ public class BruteForce : MonoBehaviour
     
     void BuildRightShelves(int z)
     {
-        Debug.Log(Math.Ceiling(width/2d));
+        //Debug.Log(Math.Ceiling(width/2d));
         if(z< (Math.Ceiling(width+1/2d))){
             for (int x = 0; x < _layout[width-z].Length; x++)
             {

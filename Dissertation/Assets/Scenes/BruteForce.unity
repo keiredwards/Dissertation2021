@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9351b75f8a49ae949a1af359365fca9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 23
+  width: 14
   SocialDistance: 2
   Path: {fileID: 1736745141943396166, guid: 39eb1cd4f1ea9f24c8e006c5b959e590, type: 3}
   Shelf: {fileID: 3999423801766347792, guid: 961d29d490027d248911d22b3bc19aa0, type: 3}
@@ -158,6 +158,9 @@ MonoBehaviour:
     type: 3}
   RightShelf: {fileID: 8213834436147095269, guid: de46544beee8cb64d95aec78d7470769,
     type: 3}
+  Uniform: 1
+  Heights: 08000000080000000c0000000c0000000c0000000c000000080000000800000008000000080000000c0000000c000000
+  height: 8
 --- !u!4 &715514656
 Transform:
   m_ObjectHideFlags: 0

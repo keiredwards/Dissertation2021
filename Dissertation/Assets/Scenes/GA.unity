@@ -255,7 +255,7 @@ PrefabInstance:
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
       propertyPath: width
-      value: 10
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
@@ -265,7 +265,7 @@ PrefabInstance:
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
       propertyPath: height
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
@@ -296,6 +296,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
+      propertyPath: pathWidthMult
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
       propertyPath: MaxGenerations
       value: 6
       objectReference: {fileID: 0}
@@ -313,17 +318,22 @@ PrefabInstance:
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
       propertyPath: SocialDistance
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
       propertyPath: maxGenerations
-      value: 5000
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
+      propertyPath: pathWidthCheck
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
       propertyPath: populationSize
-      value: 100
+      value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
@@ -343,7 +353,7 @@ PrefabInstance:
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
       propertyPath: oneLengthShelvesCount
-      value: 56
+      value: 52
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}

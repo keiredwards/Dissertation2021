@@ -20,11 +20,14 @@ public class GeneticAlgorithm : MonoBehaviour
     public bool RouletteWheel;
     public bool TruncatedSelect;
     public bool RandomSelect;
+    public bool pathWidthCheck;
     private int bestLayoutIndividual;
     private int bestLayoutGeneration;
     public int SocialDistance;
     public float ParentSelectionPercentage;
-    public float pathFitnessmult; 
+    public float pathFitnessmult;
+    public float pathWidthMult;
+    
 
     [FormerlySerializedAs("Height")] public int height;
 
@@ -48,7 +51,7 @@ public class GeneticAlgorithm : MonoBehaviour
 
     private static int[,,] _oneDLayouts;
     private static int[,,] _parentIndexes;
-    public static int[,] FitnessScores;
+    public static float[,] FitnessScores;
     private bool complete = false;
 
     bool genMax = false;
@@ -72,7 +75,7 @@ public class GeneticAlgorithm : MonoBehaviour
         totalShelves = populationSize * oneLengthShelvesCount;
         _oneDLayouts = new int[maxGenerations, populationSize, width * height];
         _parentIndexes = new int[maxGenerations, populationSize, 2];
-        FitnessScores = new int[maxGenerations, populationSize];
+        FitnessScores = new float[maxGenerations, populationSize];
         shelvesChecked = new int[maxGenerations];
 
         var level = new GameObject();
@@ -616,7 +619,7 @@ public class GeneticAlgorithm : MonoBehaviour
         oldbest.transform.position = new Vector3(1000, 0, 0);
         Destroy(oldbest);
 
-
+        int pathcount = 0;
 
 
 
@@ -648,7 +651,8 @@ public class GeneticAlgorithm : MonoBehaviour
                 var path = Instantiate(camPath, new Vector3(x + -100, 0, z + -100),
                     Quaternion.identity);
                 path.transform.parent = GameObject.Find("Best").transform;
-                path.name = _oneDLayouts[bestLayoutGeneration, bestLayoutIndividual, x + z * width].ToString();
+                path.name = pathcount.ToString();
+                pathcount += 1;
             }
             else if (_oneDLayouts[generation, individual, x + z * width] < 200000
             ) //shelves are denoted by <200,000 values
@@ -694,7 +698,7 @@ public class GeneticAlgorithm : MonoBehaviour
         }
         
         
-        //Debug.Log("average fitness:         " + averageFitness/populationSize);
+        Debug.Log("average fitness:         " + averageFitness/populationSize + "     best fitness:" + bestLayout);
 
         //Debug.Log(averageFitness);
 
@@ -1000,7 +1004,7 @@ public class GeneticAlgorithm : MonoBehaviour
                     if (x - distance >= 0 && x % width >= distance)
                     {
                         //Debug.Log("space to left");
-                        if ((_oneDLayouts[generation, individual, x - distance] >= 200000)) //is a shelf
+                        if (!(_oneDLayouts[generation, individual, x - distance] < 200000)) //is a shelf
                         {
                             adjacentpathsL += 1;
                             //Debug.Log("l");
@@ -1038,33 +1042,35 @@ public class GeneticAlgorithm : MonoBehaviour
                         }
                     }
 
-                    
-                /*
 
-                    if (adjacentpathsL < SocialDistance && adjacentpathsL > 0
-                    ) //if a side is open but the gap is less than the distance
+                    if (pathWidthCheck == true)
                     {
-                        FitnessScores[generation, individual] += 1;
+
+                        if (adjacentpathsL < SocialDistance && adjacentpathsL > 0
+                        ) //if a side is open but the gap is less than the distance
+                        {
+                            FitnessScores[generation, individual] += pathWidthMult;
+                        }
+
+                        if (adjacentpathsR < SocialDistance && adjacentpathsR > 0)
+                        {
+                            FitnessScores[generation, individual] += pathWidthMult;
+                        }
+
+                        if (adjacentpathsU < SocialDistance && adjacentpathsU > 0)
+                        {
+                            FitnessScores[generation, individual] += pathWidthMult;
+                        }
+
+                        if (adjacentpathsD < SocialDistance && adjacentpathsD > 0)
+                        {
+                            FitnessScores[generation, individual] += pathWidthMult;
+                        }
+
                     }
 
-                    if (adjacentpathsR < SocialDistance && adjacentpathsR > 0)
-                    {
-                        FitnessScores[generation, individual] += 1;
-                    }
+                
 
-                    if (adjacentpathsU < SocialDistance && adjacentpathsU > 0)
-                    {
-                         FitnessScores[generation, individual] += 1;
-                    }
-
-                    if (adjacentpathsD < SocialDistance && adjacentpathsD > 0)
-                    {
-                          FitnessScores[generation, individual] += 1;
-                    }
-                    
-                    */
-
-    
                 }
                 if ((adjacentpathsL < SocialDistance) && (adjacentpathsR < SocialDistance) && (adjacentpathsU < SocialDistance) && (adjacentpathsD < SocialDistance)) // if no sides are open
                 {
