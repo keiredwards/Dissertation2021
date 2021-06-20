@@ -353,7 +353,7 @@ PrefabInstance:
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
       propertyPath: oneLengthShelvesCount
-      value: 53
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
