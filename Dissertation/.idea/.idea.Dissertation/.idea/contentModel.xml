@@ -9,7 +9,6 @@
       <e p="Assets" t="Include">
         <e p="BruteForce.cs" t="Include" />
         <e p="Counter.cs" t="Include" />
-        <e p="FitnessOneLongShelf.cs" t="Include" />
         <e p="GeneticAlgorithm.cs" t="Include" />
         <e p="Scripts" t="Include">
           <e p="SimpleCameraController.cs" t="Include" />

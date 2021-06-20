@@ -254,6 +254,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
+      propertyPath: wall
+      value: 
+      objectReference: {fileID: 3999423801766347792, guid: 961d29d490027d248911d22b3bc19aa0,
+        type: 3}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
       propertyPath: width
       value: 14
       objectReference: {fileID: 0}
@@ -286,8 +292,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
+      propertyPath: layoutWidth
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
       propertyPath: RandomSelect
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
+      propertyPath: layoutHeight
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
@@ -322,13 +338,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
+      propertyPath: bestLayoutPath
+      value: 
+      objectReference: {fileID: 4787912927255345040, guid: 6705751183604294a9cc1dee8d30c63e,
+        type: 3}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
       propertyPath: maxGenerations
       value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
       propertyPath: pathWidthCheck
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
@@ -337,7 +359,28 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
+      propertyPath: socialDistance
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
       propertyPath: TruncatedSelect
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
+      propertyPath: bestLayoutShelf
+      value: 
+      objectReference: {fileID: 1046260739890054796, guid: 3b5c17f6191fa7c40814b92050321071,
+        type: 3}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
+      propertyPath: numberOfShelves
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
+      propertyPath: pathFitnessMult
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
@@ -352,8 +395,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}
+      propertyPath: singlePointCrossOver
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
       propertyPath: oneLengthShelvesCount
       value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
+        type: 3}
+      propertyPath: rouletteWheelSelection
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3501460496039207440, guid: 37f67f4c23683a44c947ee4be9e2f0b6,
         type: 3}

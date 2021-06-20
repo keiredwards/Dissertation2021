@@ -60,7 +60,6 @@
   <ItemGroup>
      <Compile Include="Assets\BruteForce.cs" />
      <Compile Include="Assets\Counter.cs" />
-     <Compile Include="Assets\FitnessOneLongShelf.cs" />
      <Compile Include="Assets\GeneticAlgorithm.cs" />
      <Compile Include="Assets\SWS\Examples\Scripts\CameraInputDemo.cs" />
      <Compile Include="Assets\SWS\Examples\Scripts\EventCollisionTrigger.cs" />
